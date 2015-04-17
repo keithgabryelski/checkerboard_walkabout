@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    <title>Checkerboard Walkabout!</title>
+  </head>
+  <body onload="boot()">
+    <script type="text/javascript" src="renderer_process/canvas_manager.js"></script>
+    <script type="text/javascript" src="renderer_process/checkerboard_space.js"></script>
+    <script type="text/javascript" src="renderer_process/checkerboard.js"></script>
+    <script type="text/javascript" src="renderer_process/checker_piece.js"></script>
+    <script type="text/javascript" src="renderer_process/walkabout.js"></script>
+    <script type="text/javascript" src="renderer_process/audio_board.js"></script>
+    <script type="text/javascript" src="renderer_process/ui.js"></script>
+    <script type="text/javascript" src="renderer_process/machine.js"></script>
+    <script type="text/javascript" src="renderer_process/events.js"></script>
+
+    <h1>Checkerboard Walkabout</h1>
+    <h2>Status: <code id="statusField">NO-STATUS</code></h2>
+
+    Board Size: <input type="text" size="8" id="board_size" value="8" />
+    Space Size: <input type="text" size="8" id="space_size" value="64" />
+     <input type="submit" id="configure" value="Configure" onClick="the_machine.uiState.handle_event('configure')"
+                                                onContextMenu="the_machine.uiState.handle_event('change')" />
+<br/>
+    Go: <input type="submit" id="go" value="Go" onClick="the_machine.uiState.handle_event('go')" />
+    Step: <input type="submit" id="step" value="Step" onClick="the_machine.uiState.handle_event('step')" />
+    Stop: <input type="submit" id="stop" value="Stop" onClick="the_machine.uiState.handle_event('stop')" />
+    Reset: <input type="submit" id="reset" value="Reset" onClick="the_machine.uiState.handle_event('reset')" />
+    <input type="hidden" id="checker_piece_style" value="normal" />
+<br/>
+<hr/>
+    <div style="position: relative;">
+     <canvas id="checkerboard_layer0" width="0" height="0" 
+       style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+     <canvas id="checkerboard_layer1" width="0" height="0" 
+       style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+    </div>
+  </body>
+</html>
