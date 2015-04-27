@@ -43,11 +43,6 @@ class CheckerPiece extends View
 	this.remove();
     }
 
-    update() {
-	console.log("checkerpiece updated: " + this.name);
-	return null;
-    }
-
     render() {
 	console.log("checkerpiece render: " + this.name);
     }

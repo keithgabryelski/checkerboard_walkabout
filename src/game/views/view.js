@@ -7,10 +7,6 @@ class View
 	this.needsRendering = false;
     }
 
-    update(state) {
-	return null;
-    }
-
     render(state) {
     }
 }
