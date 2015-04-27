@@ -1,16 +1,19 @@
 // manages the canvases for the machine parts
 // there are currently two canvases:
-// layer0 (the background) is used for the checkerboard and the markers, it is named "checkerboard"
+// layer0 (the background) is used for the checkerboard and the markers, it is named "board"
 // layer1 (the foreground) is used for the checker piece animation
 
 class CanvasManager
 {
-    // canvas_id: string the base of the canvas element
-    constructor(canvas_id) {
-	this.canvasId = canvas_id;
+    constructor(configuration) {
+	this.configuration = configuration;
+	this.canvasId = "checkerboard";
 	this.canvasMap = new Map()
-	this.canvasMap.set("checkerboard", document.getElementById(canvas_id + "_layer0"));
-	this.canvasMap.set("piece", document.getElementById(canvas_id + "_layer1"));
+	this.canvasMap.set("board", document.getElementById(this.canvasId + "_layer0"));
+	this.canvasMap.set("piece", document.getElementById(this.canvasId + "_layer1"));
+	for (let [name, canvas] of this.canvasMap) {
+	    console.log("has canvas: '" + name + "', value: " + canvas);
+	}
     }
 
     // retrieve the canvas for the named layer
@@ -41,3 +44,5 @@ class CanvasManager
 	}
     }
 }
+
+export default CanvasManager;

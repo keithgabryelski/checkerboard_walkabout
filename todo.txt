@@ -1,0 +1,6 @@
+checkerpiece update and render should have stuff in it.
+implement at least one other walkabout
+
+
+
+
