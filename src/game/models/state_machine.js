@@ -30,11 +30,13 @@ class StateMachine
     }
 
     change_walkabout_style() {
+	/*  this is for future work
 	if (this.state.configurationControls.walkaboutStyle == "naive") {
 	    this.state.configurationControls.walkaboutStyle = "tortoise and hare";
 	} else {
 	    this.state.configurationControls.walkaboutStyle = "naive";
 	}
+	*/
 	console.log("new walkabout style is now: " + this.state.configurationControls.walkaboutStyle);
 	return null;
     }

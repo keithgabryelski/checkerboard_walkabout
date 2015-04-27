@@ -8,7 +8,6 @@ import NormalCheckerPiece from './views/normal_checker_piece';
 import QBertCheckerPiece from './views/qbert_checker_piece';
 import Location from './models/location';
 import NaiveWalkabout from './models/naive_walkabout';
-import TortoiseAndHareWalkabout from './models/tortoise_and_hare_walkabout';
 
 // game controller
 class Game {
@@ -120,9 +119,6 @@ class Game {
 	    switch (state.configurationControls.walkaboutStyle) {
 	    case 'naive':
 		state.walkabout = new NaiveWalkabout(state);
-		break;
-	    case 'tortoise and hare':
-		state.walkabout = new TortoiseAndHareWalkabout(state);
 		break;
 	    default:
 		console.log("!! OH NOES! unknown walkabout style '" + state.configurationControls.walkabout_style + "'");
