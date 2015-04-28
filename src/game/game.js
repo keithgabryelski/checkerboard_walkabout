@@ -140,6 +140,7 @@ class Game {
 	    console.log("we should step");
 	    state.shouldStep = false;
 	    state.walkaboutStatus = state.walkabout.move_piece(state);
+	    this.checkerPiece.walkaboutStatus = state.walkaboutStatus;
 	    switch (state.walkaboutStatus.status) {
 	    case "on board":
 		break;
@@ -193,27 +194,17 @@ class Game {
 	    switch (walkabout_status.status) {
 	    case "on board":
 		console.log("step: on board location=(" + walkabout_status.location.column + ", " + walkabout_status.location.row + ")");
-		this.checkerPiece.move(walkabout_status.location);
 		state.status = "on board";
 		break;
 
 	    case "off board":
 		console.log("step: status=" + walkabout_status.status);
-		if (this.checkerPiece.currentLocation.column == state.walkabout.startingLocation.column &&
-		    this.checkerPiece.currentLocation.row == state.walkabout.startingLocation.row) {
-		    this.checkerboard.draw_startoffboard_arrow(this.checkerPiece.currentLocation, state);
-		} else {
-		    this.checkerboard.draw_offboard_arrow(this.checkerPiece.currentLocation, state);
-		}
-		this.checkerPiece.move_off_board();
 		state.status = "off board";
 		break;
 
 	    case "looped":
 		console.log("step: status=" + walkabout_status.status);
 		console.log("currentLocation: " + this.checkerPiece.currentLocation.column + ", " + this.checkerPiece.currentLocation.row);
-		this.checkerboard.draw_end_arrow(this.checkerPiece.currentLocation, state);
-		this.checkerPiece.remove_due_to_loop();
 		console.log("looping -- clearing interval: " + state.intervalId);
 		state.status = "looped";
 		break;
@@ -238,22 +229,19 @@ class Game {
 	if (!this.checkerPiece) {
 	    switch (state.configurationControls.checkerPieceStyle) {
 	    case "normal":
-		this.checkerPiece = new NormalCheckerPiece(this.canvasManager, state);
+		this.checkerPiece = new NormalCheckerPiece(this.canvasManager, state, this.checkerboard);
 		break;
 	    case "qbert":
-		this.checkerPiece = new QBertCheckerPiece(this.canvasManager, state);
+		this.checkerPiece = new QBertCheckerPiece(this.canvasManager, state, this.checkerboard);
 		break;
 	    default:
 		console.log("unknown CheckerPieceStyle: '" + state.configurationControls.checkerPieceStyle + "'");
 		break;
 	    }
-	    this.checkerPiece.currentLocation = state.walkabout.currentLocation;
-	    this.checkerPiece.draw_starting_piece();
-	    this.checkerboard.draw_start_arrow(this.checkerPiece.currentLocation, state)
 	    state.status = "on board";
 	}
 	
-	this.checkerPiece.render();
+	this.checkerPiece.render(state);
     }
 }
 

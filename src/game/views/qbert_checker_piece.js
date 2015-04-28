@@ -4,8 +4,8 @@ import Position from '../models/position';
 
 class QBertCheckerPiece extends CheckerPiece
 {
-    constructor(canvas_manager, state) {
-	super(canvas_manager, "qbert", state);
+    constructor(canvas_manager, state, checkerboard) {
+	super(canvas_manager, "qbert", state, checkerboard);
 	this.imageObj = new Image();
 	this.imageObj.src = 'img/qbert.png';
 	this.imageOriginalSize = 48;

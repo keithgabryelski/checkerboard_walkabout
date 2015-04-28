@@ -5,8 +5,8 @@ import Position from '../models/position'
 class NormalCheckerPiece extends CheckerPiece
 {
     // current_space: a CheckerboardSpace, the starting location for this CheckerPiece
-    constructor(canvas_manager, state) {
-	super(canvas_manager, "normal", state);
+    constructor(canvas_manager, state, checkerboard) {
+	super(canvas_manager, "normal", state, checkerboard);
 	this.circleRadius = state.configurationControls.spaceSize * 0.50 / 2;
 	this.audioBoard = new NormalAudioBoard();
     }
