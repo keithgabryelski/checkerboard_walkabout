@@ -3,22 +3,25 @@ import Position from '../models/position'
 
 class CheckerPiece extends View
 {
-    constructor(canvas_manager, name, state, checkerboard) {
+    getClassName() {
+        return CheckerPiece.name;
+    }
+
+    constructor(canvas_manager, state, checkerboard, starting_location) {
 	super(canvas_manager, "piece");
-	console.log("CheckerPiece.constructor: name=" + name);
-	this.name = name;
+	console.log("CheckerPiece.constructor: " + this);
 	this.state = state;
 	this.audioBoard = null;
-	this.currentLocation = null;
 	this.walkaboutStatus = null;
 	this.drawStartingLocation = true;
 	this.checkerboard = checkerboard;
+	this.currentLocation = starting_location;
     }
 
-    get currentPositionCenter() {
+    positionCenter(location) {
 	return new Position(
-	    this.currentLocation.column * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2,
-	    this.currentLocation.row * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2
+	    location.column * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2,
+	    location.row * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2
 	)
     }
 
@@ -47,47 +50,48 @@ class CheckerPiece extends View
     }
 
     render(state) {
-	console.log("checkerpiece render: " + this.name);
+	console.log("checkerpiece render: " + this);
 	if (this.drawStartingLocation) {
 	    this.drawStartingLocation = false;
-	    this.currentLocation = state.walkabout.currentLocation;
-	    this.draw_starting_piece();
-	    this.checkerboard.draw_start_arrow(this.currentLocation, state);
+	    for (let i = 0; i < this.currentLocation.length; ++i) {
+		let location = this.currentLocation[i];
+		let position = this.positionCenter(location);
+		//let scale = 1.0 / (i+1);
+		let scale = 1.0;
+		this.draw_starting_piece(location, scale);
+	    }
+	    this.checkerboard.draw_start_arrow(this.currentLocation[0], state);
 	}
 
 	if (this.walkaboutStatus) {
 	    let walkabout_status = this.walkaboutStatus;
 	    this.walkaboutStatus = null;
+	    console.log("rendering checkerpiece: " + walkabout_status);
 	    switch (walkabout_status.status) {
 	    case "on board":
-		console.log("step: on board location=(" + walkabout_status.location.column + ", " + walkabout_status.location.row + ")");
-		this.move(walkabout_status.location);
+		console.log("rendering walkabout status: " + walkabout_status.locations);
+		this.move(walkabout_status.locations);
 		state.status = "on board";
 		break;
 
 	    case "off board":
-		console.log("step: status=" + walkabout_status.status);
-		if (this.currentLocation.column == state.walkabout.startingLocation.column &&
-		    this.currentLocation.row == state.walkabout.startingLocation.row) {
-		    this.checkerboard.draw_startoffboard_arrow(this.currentLocation, state);
+		if (walkabout_status.endingLocation.isEqualTo(walkabout_status.startingLocation)) {
+		    this.checkerboard.draw_startoffboard_arrow(walkabout_status.endingLocation, state);
 		} else {
-		    this.checkerboard.draw_offboard_arrow(this.currentLocation, state);
+		    this.checkerboard.draw_offboard_arrow(walkabout_status.endingLocation, state);
 		}
 		this.move_off_board();
 		state.status = "off board";
 		break;
 
 	    case "looped":
-		console.log("step: status=" + walkabout_status.status);
-		console.log("currentLocation: " + this.currentLocation.column + ", " + this.currentLocation.row);
-		this.checkerboard.draw_end_arrow(this.currentLocation, state);
+		this.checkerboard.draw_end_arrow(walkabout_status.endingLocation, state);
 		this.remove_due_to_loop();
-		console.log("looping -- clearing interval: " + state.intervalId);
 		state.status = "looped";
 		break;
 
 	    default:
-		console.log("unexpected walkabout status: '" + walkabout_status.status + "'");
+		console.log("unexpected walkabout status: " + walkabout_status);
 		break;
 	    }
 	}

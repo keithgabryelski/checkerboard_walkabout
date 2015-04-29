@@ -4,6 +4,10 @@ import Position from '../models/position'
 
 class Checkerboard extends View
 {
+    getClassName() {
+        return Checkerboard.name;
+    }
+
     constructor(canvas_manager, state) {
 	super(canvas_manager, "board");
 	this.boardSize = state.configurationControls.boardSize;

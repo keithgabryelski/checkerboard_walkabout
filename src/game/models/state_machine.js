@@ -1,9 +1,16 @@
-class StateMachine
+import GameObject from '../game_object';
+import StateMachineReset from './state_machine_reset';
+
+class StateMachine extends GameObject
 {
-    constructor(state, name) {
-	console.log("StateMachine constructor: name=" + name + ", state=" + state);
+    getClassName() {
+        return StateMachine.name;
+    }
+
+    constructor(state) {
+	super();
 	this.state = state;
-	this.name = name;
+	console.log("constructing: " + this);
     }
 
     get mainControls() {
@@ -25,20 +32,17 @@ class StateMachine
 	    this.state.configurationControls.checkerPieceStyle = "normal";
 	}
 	console.log("new piece style is now: " + this.state.configurationControls.checkerPieceStyle);
-	this.state.shouldChangeCheckerPiece = true;
-	return null;
+	return new StateMachineReset(this.state);
     }
 
     change_walkabout_style() {
-	/*  this is for future work
 	if (this.state.configurationControls.walkaboutStyle == "naive") {
 	    this.state.configurationControls.walkaboutStyle = "tortoise and hare";
 	} else {
 	    this.state.configurationControls.walkaboutStyle = "naive";
 	}
-	*/
 	console.log("new walkabout style is now: " + this.state.configurationControls.walkaboutStyle);
-	return null;
+	return new StateMachineReset(this.state);
     }
 
     setup_ui() {

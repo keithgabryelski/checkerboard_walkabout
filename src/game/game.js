@@ -1,3 +1,4 @@
+import GameObject from './game_object';
 import StateMachineReset from './models/state_machine_reset';
 import StateMachineEnd from './models/state_machine_end';
 import State from './models/state';
@@ -8,10 +9,16 @@ import NormalCheckerPiece from './views/normal_checker_piece';
 import QBertCheckerPiece from './views/qbert_checker_piece';
 import Location from './models/location';
 import NaiveWalkabout from './models/naive_walkabout';
+import TortoiseAndHareWalkabout from './models/tortoise_and_hare_walkabout';
 
 // game controller
-class Game {
+class Game extends GameObject {
+    getClassName() {
+	return Game.name;
+    }
+
     constructor(configuration) {
+	super();
 	// game models
 	this.stateMachine = null;
 
@@ -34,7 +41,7 @@ class Game {
 
     // ui
     change_state(new_state) {
-	console.log("changing state from: " + (this.stateMachine && this.stateMachine.name) + ", to: " + (new_state.name))
+	console.log("changing state from: " + this.stateMachine + ", to: " + new_state)
 	let old_state = this.stateMachine;
 	this.stateMachine = new_state;
 	new_state = this.stateMachine.enter_state(old_state);
@@ -49,7 +56,7 @@ class Game {
     }
 
     invoke(method, ...args) {
-	console.log("state: " + this.stateMachine.name + ", method: " + method);
+	console.log("state: " + this.stateMachine + ", method: " + method);
 	let new_state = method.apply(this.stateMachine, args)
 	if (new_state) {
 	    this.change_state(new_state);
@@ -108,6 +115,7 @@ class Game {
     update(state) {
 	state.configurationControls.boardSize = parseInt(document.getElementById("board_size").value);
 	state.configurationControls.spaceSize = parseInt(document.getElementById("space_size").value);
+
 	if (state.shouldReset) {
 	    state.shouldReset = false;
 	    this.canvasManager = new CanvasManager(state.configurationControls);
@@ -115,16 +123,23 @@ class Game {
 	    this.checkerboard = null;
 	    this.checkerPiece = null;
 	}
+
 	if (!state.walkabout) {
 	    switch (state.configurationControls.walkaboutStyle) {
 	    case 'naive':
 		state.walkabout = new NaiveWalkabout(state);
+		state.heading = "Checkerboard Walkabout: Naive";
+		break;
+	    case 'tortoise and hare':
+		state.walkabout = new TortoiseAndHareWalkabout(state);
+		state.heading = "Checkerboard Walkabout: Tortoise and Hare";
 		break;
 	    default:
 		console.log("!! OH NOES! unknown walkabout style '" + state.configurationControls.walkabout_style + "'");
 		break;
 	    }
 	}
+
 	if (state.shouldWalk) {
 	    if (state.shouldStop) {
 		console.log("we should stop");
@@ -136,6 +151,7 @@ class Game {
 		state.shouldWalk = false;
 	    }
 	}
+
 	if (state.shouldStep) {
 	    console.log("we should step");
 	    state.shouldStep = false;
@@ -155,6 +171,7 @@ class Game {
 		break;
 	    }
 	}
+
 	if (!this.checkerboard) {
 	    console.log("resetting checkerboard");
 	    state.checkerboardSpaceDirections = Array(state.configurationControls.boardSize * state.configurationControls.boardSize);
@@ -168,6 +185,7 @@ class Game {
 	    }
 	    this.checkerboard = new Checkerboard(this.canvasManager, state);
 	}
+
 	return null;
     }
 
@@ -177,6 +195,13 @@ class Game {
 	    let statusField = document.getElementById("statusField");
 	    statusField.innerHTML = state.status;
 	    state.status = null;
+	}
+
+	if (state.heading) {
+	    console.log("setting heading: " + state.heading);
+	    let headingField = document.getElementById("headingField");
+	    headingField.innerHTML = state.heading;
+	    state.heading = null;
 	}
 
 	document.getElementById("go").disabled = !state.mainControls.goButtonEnabled;
@@ -193,46 +218,36 @@ class Game {
 	    state.walkaboutStatus = null;
 	    switch (walkabout_status.status) {
 	    case "on board":
-		console.log("step: on board location=(" + walkabout_status.location.column + ", " + walkabout_status.location.row + ")");
+		console.log("step: status=" + walkabout_status);
 		state.status = "on board";
 		break;
 
 	    case "off board":
-		console.log("step: status=" + walkabout_status.status);
+		console.log("step: status=" + walkabout_status);
 		state.status = "off board";
 		break;
 
 	    case "looped":
-		console.log("step: status=" + walkabout_status.status);
-		console.log("currentLocation: " + this.checkerPiece.currentLocation.column + ", " + this.checkerPiece.currentLocation.row);
-		console.log("looping -- clearing interval: " + state.intervalId);
+		console.log("step: status=" + walkabout_status);
 		state.status = "looped";
 		break;
 
 	    default:
-		console.log("unexpected walkabout status: '" + walkabout_status.status + "'");
+		console.log("unexpected walkabout status=" + walkabout_status);
 		break;
 	    }
 	}
 	
 	this.checkerboard.render(state);
 
-	if (state.shouldChangeCheckerPiece) {
-	    state.shouldChangeCheckerPiece = false;
-	    console.log("should change checkerpiece to: " + state.configurationControls.checkerPieceStyle);
-	    if (this.checkerPiece) {
-		this.checkerPiece.remove();
-	    }
-	    this.checkerPiece = null;
-	}
-
 	if (!this.checkerPiece) {
 	    switch (state.configurationControls.checkerPieceStyle) {
 	    case "normal":
-		this.checkerPiece = new NormalCheckerPiece(this.canvasManager, state, this.checkerboard);
+		console.log("making normal checkerpiece: " + state.walkabout.starting_location);
+		this.checkerPiece = new NormalCheckerPiece(this.canvasManager, state, this.checkerboard, state.walkabout.starting_location);
 		break;
 	    case "qbert":
-		this.checkerPiece = new QBertCheckerPiece(this.canvasManager, state, this.checkerboard);
+		this.checkerPiece = new QBertCheckerPiece(this.canvasManager, state, this.checkerboard, state.walkabout.starting_location);
 		break;
 	    default:
 		console.log("unknown CheckerPieceStyle: '" + state.configurationControls.checkerPieceStyle + "'");

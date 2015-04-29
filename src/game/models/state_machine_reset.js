@@ -1,10 +1,11 @@
+import GameObject from '../game_object';
 import StateMachine from './state_machine';
 import StateMachineReady from './state_machine_ready';
 
 class StateMachineReset extends StateMachine
 {
-    constructor(state) {
-	super(state, "StateMachineReset");
+    getClassName() {
+        return StateMachineReset.name;
     }
 
     enter_state(previous_state) {

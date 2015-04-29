@@ -1,11 +1,18 @@
+import GameObject from '../game_object';
+
 // manages the canvases for the machine parts
 // there are currently two canvases:
 // layer0 (the background) is used for the checkerboard and the markers, it is named "board"
 // layer1 (the foreground) is used for the checker piece animation
 
-class CanvasManager
+class CanvasManager extends GameObject
 {
+    getClassName() {
+        return CanvasManager.name;
+    }
+
     constructor(configuration) {
+	super();
 	this.configuration = configuration;
 	this.canvasId = "checkerboard";
 	this.canvasMap = new Map()

@@ -4,55 +4,68 @@ import Position from '../models/position'
 
 class NormalCheckerPiece extends CheckerPiece
 {
-    // current_space: a CheckerboardSpace, the starting location for this CheckerPiece
-    constructor(canvas_manager, state, checkerboard) {
-	super(canvas_manager, "normal", state, checkerboard);
+    getClassName() {
+        return NormalCheckerPiece.name;
+    }
+
+    constructor(canvas_manager, state, checkerboard, starting_location) {
+	super(canvas_manager, state, checkerboard, starting_location);
 	this.circleRadius = state.configurationControls.spaceSize * 0.50 / 2;
 	this.audioBoard = new NormalAudioBoard();
     }
 
-    // animate the move of the CheckerPiece to CheckerboardSpace given, playing appropriate audio
-    // to_space: CheckboardSpace to move to
-    move(to_location) {
+    move(to_locations) {
 	this.audioBoard.play_move_sound();
-	let to_position_center = new Position(
-	    to_location.column * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2,
-	    to_location.row * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2
-	)
-	NormalCheckerPiece.animate_move(this, this.currentPositionCenter, to_position_center, (new Date()).getTime());
-	this.currentLocation = to_location;
+	console.log("moving: " + to_locations.length);
+	for (let i = 0; i < to_locations.length; ++i) {
+	    let from_location = this.currentLocation[i];
+	    let to_location = to_locations[i];
+	    console.log("moving from: " + from_location + ", to: " + to_location);
+	    let from_position_center = this.positionCenter(from_location);
+	    let to_position_center = this.positionCenter(to_location);
+	    //let scale = 1.0 / (i+1);
+	    let scale = 1.0;
+	    NormalCheckerPiece.animate_move(this, from_position_center, to_position_center, scale, (new Date()).getTime());
+	}
+	this.currentLocation = to_locations;
     }
 
     draw() {
-	console.log("NormalCheckerPiece.draw(): column=" + this.currentLocation.column + ", row=" + this.currentLocation.row);
-	let center_x = this.currentLocation.column * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let center_y = this.currentLocation.row * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	this.draw_circle(center_x, center_y, 'black');
+	for (let i = 0; i < this.currentLocation.length; ++i) {
+	    let location = this.currentLocation[i];
+	    let position = this.positionCenter(location);
+	    //let scale = 1.0 / (i+1);
+	    let scale = 1.0;
+	    this.draw_circle(position, scale, 'black');
+	}
     }
 
     remove() {
-	console.log("remove: " + this.currentLocation.column + ", " + this.currentLocation.row);
-	let center_x = this.currentLocation.column * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let center_y = this.currentLocation.row * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	this.clear_circle(center_x, center_y);
+	for (let i = 0; i < this.currentLocation.length; ++i) {
+	    let location = this.currentLocation[i];
+	    let position = this.positionCenter(location);
+	    //let scale = 1.0 / (i+1);
+	    let scale = 1.0;
+	    this.clear_circle(position, scale);
+	}
     }
 
-    draw_circle(center_x, center_y, color) {
-	// console.log("draw_circle(" + center_x + ", " + center_y + ", " + this.circleRadius + ", ...) color: " + color);
+    draw_circle(position, scale, color) {
 	let context = this.context
 	context.beginPath();
-	context.arc(center_x, center_y, this.circleRadius, 0, 2 * Math.PI, false);
+	context.arc(position.x, position.y, this.circleRadius * scale, 0, 2 * Math.PI, false);
 	context.fillStyle = color;
 	context.fill();
     }
 
-    clear_circle(center_x, center_y) {
+    clear_circle(position, scale) {
 	let context = this.context
 	context.beginPath();
-	context.clearRect(center_x - this.circleRadius - 1, center_y - this.circleRadius - 1, this.circleRadius * 2 + 2, this.circleRadius * 2 + 2);
+	context.clearRect(position.x - (this.circleRadius * scale) - 1, position.y - (this.circleRadius * scale) - 1, (this.circleRadius * scale) * 2 + 2, (this.circleRadius * scale) * 2 + 2);
     }
 
-    static animate_move(checker_piece, current_position, to_position, last_time) {
+    static animate_move(checker_piece, current_position, to_position, scale, last_time) {
+	console.log("antimate move: " + checker_piece + ", current: " + current_position + ", to: " + to_position + ", scale: " + scale);
 	let current_time = (new Date()).getTime();
         let time = current_time - last_time;
 
@@ -81,13 +94,15 @@ class NormalCheckerPiece extends CheckerPiece
 	    new_y = destination_y;
 	}
 
-        // redraw
-        checker_piece.clear_circle(current_position.x, current_position.y);
-        checker_piece.draw_circle(new_x, new_y, 'black');
+	let new_position = new Position(new_x, new_y);
 
-	if (new_x != destination_x || new_y != destination_y) {
+        // redraw
+        checker_piece.clear_circle(current_position, scale);
+        checker_piece.draw_circle(new_position, scale, 'black');
+
+	if (!new_position.isEqualTo(to_position)) {
 	    window.requestAnimationFrame(function() {
-		NormalCheckerPiece.animate_move(checker_piece, new Position(new_x, new_y), to_position, current_time);
+		NormalCheckerPiece.animate_move(checker_piece, new_position, to_position, scale, current_time);
             });
 	}
     }

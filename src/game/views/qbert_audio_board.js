@@ -2,6 +2,10 @@ import AudioBoard from './audio_board'
 
 class QBertAudioBoard extends AudioBoard
 {
+    getClassName() {
+        return QBertAudioBoard.name;
+    }
+
     constructor() {
 	super();
 	this.audio_start = new Audio('audio/qbert_start.wav');

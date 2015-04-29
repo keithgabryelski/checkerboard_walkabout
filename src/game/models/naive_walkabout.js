@@ -1,9 +1,15 @@
 import Location from './location';
-import WalkaboutStatus from './walkabout_status';
+import NaiveWalkaboutStatus from './naive_walkabout_status';
 import Walkabout from './walkabout';
+
+import GameObject from '../game_object';
 
 class NaiveWalkabout extends Walkabout
 {
+    getClassName() {
+        return NaiveWalkabout.name;
+    }
+
     constructor(state) {
 	super(state);
 	this.currentLocation = this.startingLocation;
@@ -27,19 +33,24 @@ class NaiveWalkabout extends Walkabout
 	return this.walkaboutArea[index];
     }
 
-    move_piece() {
+    move_piece(state) {
+	console.log("move_piece(): " + this.currentLocation);
+	let last_location = this.currentLocation;
 	this.currentLocation = this.next_location(this.currentLocation);
 	if (this.currentLocation == null) {
 	    this.status = "off board";
+	    console.log("off board: " + last_location);
+	    return new NaiveWalkaboutStatus(this.startingLocation, last_location, this.status, this.currentLocation);
 	} else if (this.is_space_marked(this.currentLocation)) {
-	    console.log("looping to: column=" + this.currentLocation.column + ", row=" + this.currentLocation.row)
+	    console.log("looping to: " + last_location)
 	    this.status = "looped";
+	    return new NaiveWalkaboutStatus(this.startingLocation, last_location, this.status, this.currentLocation);
 	} else {
-	    console.log("on board to: column=" + this.currentLocation.column + ", row=" + this.currentLocation.row)
+	    console.log("on board to: " + this.currentLocation)
 	    this.status = "on board";
 	    this.mark_your_territory();
+	    return new NaiveWalkaboutStatus(this.startingLocation, null, this.status, this.currentLocation);
 	}
-	return new WalkaboutStatus(this.currentLocation, this.status);
     }
 
 }

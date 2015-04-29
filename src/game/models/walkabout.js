@@ -1,13 +1,23 @@
+import GameObject from '../game_object';
 import Location from './location';
 
-class Walkabout
+class Walkabout extends GameObject
 {
+    getClassName() {
+        return Walkabout.name;
+    }
+
     constructor(state) {
+	super();
 	this.status = "on board";
 	let row = Math.floor(Math.random() * state.configurationControls.boardSize);
 	let column = Math.floor(Math.random() * state.configurationControls.boardSize);
 	this.startingLocation = new Location(column, row);
 	this.state = state;
+    }
+
+    get starting_location() {
+	return [this.startingLocation];
     }
 
     has_looped() {
@@ -55,7 +65,7 @@ class Walkabout
 	return null;
     }
 
-    move_piece() {
+    move_piece(state) {
 	//!! Fill in here.
 	return null;
     }

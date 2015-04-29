@@ -1,10 +1,11 @@
+import GameObject from '../game_object';
 import StateMachine from './state_machine';
 import StateMachineStopped from './state_machine_stopped';
 
 class StateMachineGo extends StateMachine
 {
-    constructor(state) {
-	super(state, "StateMachineGo");
+    getClassName() {
+        return StateMachineGo.name;
     }
 
     enter_state(previous_state) {

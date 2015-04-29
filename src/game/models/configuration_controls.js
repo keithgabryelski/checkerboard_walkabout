@@ -1,6 +1,13 @@
-class ConfigurationControls
+import GameObject from '../game_object';
+
+class ConfigurationControls extends GameObject
 {
+    getClassName() {
+        return ConfigurationControls.name;
+    }
+
     constructor(board_size, space_size, checker_piece_style, walkabout_style) {
+	super();
 	this.boardSize = board_size;
 	this.spaceSize = space_size;
 	this.checkerPieceStyle = checker_piece_style;

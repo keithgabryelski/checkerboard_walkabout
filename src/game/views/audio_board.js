@@ -1,8 +1,15 @@
 // manages audio for the checker piece
 
-class AudioBoard
+import GameObject from '../game_object';
+
+class AudioBoard extends GameObject
 {
+    getClassName() {
+        return AudioBoard.name;
+    }
+
     constructor() {
+	super();
 	this.audio_start = null;
 	this.audio_move = null;
 	this.audio_loop = null;

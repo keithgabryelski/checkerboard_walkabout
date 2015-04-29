@@ -1,6 +1,13 @@
-class MainControls
+import GameObject from '../game_object';
+
+class MainControls extends GameObject
 {
+    getClassName() {
+        return MainControls.name;
+    }
+
     constructor() {
+	super();
 	this.disable_all();
     }
 

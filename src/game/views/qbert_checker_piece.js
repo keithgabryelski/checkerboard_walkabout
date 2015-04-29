@@ -4,8 +4,12 @@ import Position from '../models/position';
 
 class QBertCheckerPiece extends CheckerPiece
 {
-    constructor(canvas_manager, state, checkerboard) {
-	super(canvas_manager, "qbert", state, checkerboard);
+    getClassName() {
+        return QBertCheckerPiece.name;
+    }
+
+    constructor(canvas_manager, state, checkerboard, starting_location) {
+	super(canvas_manager, state, checkerboard, starting_location);
 	this.imageObj = new Image();
 	this.imageObj.src = 'img/qbert.png';
 	this.imageOriginalSize = 48;
@@ -13,16 +17,20 @@ class QBertCheckerPiece extends CheckerPiece
 	this.audioBoard = new QBertAudioBoard();
     }
 
-    // animate the move of the CheckerPiece to CheckerboardSpace given, playing appropriate audio
-    // to_space: CheckboardSpace to move to
-    move(to_location) {
+    move(to_locations) {
 	this.audioBoard.play_move_sound();
-	let to_position_center = new Position(
-	    to_location.column * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2,
-	    to_location.row * this.state.configurationControls.spaceSize + this.state.configurationControls.spaceSize / 2
-	)
-	QBertCheckerPiece.animate_move(this, this.currentPositionCenter, to_position_center, (new Date()).getTime());
-	this.currentLocation = to_location;
+	console.log("moving: " + to_locations.length);
+	for (let i = 0; i < to_locations.length; ++i) {
+	    let from_location = this.currentLocation[i];
+	    let to_location = to_locations[i];
+	    console.log("moving from: " + from_location + ", to: " + to_location);
+	    let from_position_center = this.positionCenter(from_location);
+	    let to_position_center = this.positionCenter(to_location);
+	    let scale = 1.0;
+	    //let scale = 1.0 / (i+1);
+	    QBertCheckerPiece.animate_move(this, from_position_center, to_position_center, scale, (new Date()).getTime());
+	}
+	this.currentLocation = to_locations;
     }
 
     image_size() {
@@ -30,26 +38,35 @@ class QBertCheckerPiece extends CheckerPiece
     }
 
     draw() {
-	let center_x = this.currentLocation.column * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let center_y = this.currentLocation.row * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let context = this.context;
-	let image = this.imageObj;
-	let image_size = this.image_size();
-        image.onload = function() {
-	    context.drawImage(image, center_x - image_size/2, center_y - image_size/2, image_size, image_size);
-        };
+	for (let i = 0; i < this.currentLocation.length; ++i) {
+	    let location = this.currentLocation[i];
+	    let position = this.positionCenter(location);
+	    let scale = 1.0;
+	    //let scale = 1.0 / (i+1);
+	    let context = this.context;
+	    let image = this.imageObj;
+	    let image_size = this.image_size() * scale;
+            image.onload = function() {
+		context.drawImage(image, position.x - image_size/2, position.y - image_size/2, image_size, image_size);
+            };
+	}
     }
 
     remove() {
-	let center_x = this.currentLocation.column * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let center_y = this.currentLocation.row * this.state.configurationControls.spaceSize + (this.state.configurationControls.spaceSize / 2);
-	let context = this.context;
-	let image_size = this.image_size();
-	context.beginPath();
-	context.clearRect(center_x - image_size/2, center_y - image_size/2, image_size, image_size);
+	for (let i = 0; i < this.currentLocation.length; ++i) {
+	    let location = this.currentLocation[i];
+	    let position = this.positionCenter(location);
+	    let scale = 1.0;
+	    //let scale = 1.0 / (i+1);
+	    let context = this.context;
+	    let image = this.imageObj;
+	    let image_size = this.image_size() * scale;
+	    context.beginPath();
+	    context.clearRect(position.x - image_size/2, position.y - image_size/2, image_size, image_size);
+	}
     }
 
-    static animate_move(checker_piece, current_position, to_position, last_time) {
+    static animate_move(checker_piece, current_position, to_position, scale, last_time) {
 	let current_time = (new Date()).getTime();
         let time = current_time - last_time;
 
@@ -78,16 +95,18 @@ class QBertCheckerPiece extends CheckerPiece
 	    new_y = destination_y;
 	}
 
+	let new_position = new Position(new_x, new_y);
+
         // redraw
 	let context = checker_piece.context
-	let image_size = checker_piece.image_size();
+	let image_size = checker_piece.image_size() * scale;
 	context.beginPath();
 	context.clearRect(current_position.x - image_size/2, current_position.y - image_size/2, image_size, image_size);
 	context.drawImage(checker_piece.imageObj, new_x - image_size/2, new_y - image_size/2, image_size, image_size);
 
 	if (new_x != destination_x || new_y != destination_y) {
 	    window.requestAnimationFrame(function() {
-		QBertCheckerPiece.animate_move(checker_piece, new Position(new_x, new_y), to_position, current_time);
+		QBertCheckerPiece.animate_move(checker_piece, new_position, to_position, scale, current_time);
             });
 	}
     }
