@@ -17,7 +17,8 @@ class CanvasManager extends GameObject
 	this.canvasId = "checkerboard";
 	this.canvasMap = new Map()
 	this.canvasMap.set("board", document.getElementById(this.canvasId + "_layer0"));
-	this.canvasMap.set("piece", document.getElementById(this.canvasId + "_layer1"));
+	this.canvasMap.set("piece0", document.getElementById(this.canvasId + "_layer1"));
+	this.canvasMap.set("piece1", document.getElementById(this.canvasId + "_layer2"));
 	for (let [name, canvas] of this.canvasMap) {
 	    console.log("has canvas: '" + name + "', value: " + canvas);
 	}

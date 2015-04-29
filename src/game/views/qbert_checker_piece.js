@@ -26,9 +26,8 @@ class QBertCheckerPiece extends CheckerPiece
 	    console.log("moving from: " + from_location + ", to: " + to_location);
 	    let from_position_center = this.positionCenter(from_location);
 	    let to_position_center = this.positionCenter(to_location);
-	    let scale = 1.0;
-	    //let scale = 1.0 / (i+1);
-	    QBertCheckerPiece.animate_move(this, from_position_center, to_position_center, scale, (new Date()).getTime());
+	    let scale = 1.0 / (i+1);
+	    QBertCheckerPiece.animate_move(this, from_position_center, to_position_center, scale, i, (new Date()).getTime());
 	}
 	this.currentLocation = to_locations;
     }
@@ -41,9 +40,8 @@ class QBertCheckerPiece extends CheckerPiece
 	for (let i = 0; i < this.currentLocation.length; ++i) {
 	    let location = this.currentLocation[i];
 	    let position = this.positionCenter(location);
-	    let scale = 1.0;
-	    //let scale = 1.0 / (i+1);
-	    let context = this.context;
+	    let scale = 1.0 / (i+1);
+	    let context = this.canvasManager.context_for("piece" + i);
 	    let image = this.imageObj;
 	    let image_size = this.image_size() * scale;
             image.onload = function() {
@@ -56,9 +54,8 @@ class QBertCheckerPiece extends CheckerPiece
 	for (let i = 0; i < this.currentLocation.length; ++i) {
 	    let location = this.currentLocation[i];
 	    let position = this.positionCenter(location);
-	    let scale = 1.0;
-	    //let scale = 1.0 / (i+1);
-	    let context = this.context;
+	    let scale = 1.0 / (i+1);
+	    let context = this.canvasManager.context_for("piece" + i);
 	    let image = this.imageObj;
 	    let image_size = this.image_size() * scale;
 	    context.beginPath();
@@ -66,7 +63,7 @@ class QBertCheckerPiece extends CheckerPiece
 	}
     }
 
-    static animate_move(checker_piece, current_position, to_position, scale, last_time) {
+    static animate_move(checker_piece, current_position, to_position, scale, piece_index, last_time) {
 	let current_time = (new Date()).getTime();
         let time = current_time - last_time;
 
@@ -98,7 +95,7 @@ class QBertCheckerPiece extends CheckerPiece
 	let new_position = new Position(new_x, new_y);
 
         // redraw
-	let context = checker_piece.context
+	let context = checker_piece.canvasManager.context_for("piece" + piece_index);
 	let image_size = checker_piece.image_size() * scale;
 	context.beginPath();
 	context.clearRect(current_position.x - image_size/2, current_position.y - image_size/2, image_size, image_size);
@@ -106,7 +103,7 @@ class QBertCheckerPiece extends CheckerPiece
 
 	if (new_x != destination_x || new_y != destination_y) {
 	    window.requestAnimationFrame(function() {
-		QBertCheckerPiece.animate_move(checker_piece, new_position, to_position, scale, current_time);
+		QBertCheckerPiece.animate_move(checker_piece, new_position, to_position, scale, piece_index, current_time);
             });
 	}
     }

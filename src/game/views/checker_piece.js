@@ -8,7 +8,7 @@ class CheckerPiece extends View
     }
 
     constructor(canvas_manager, state, checkerboard, starting_location) {
-	super(canvas_manager, "piece");
+	super(canvas_manager, "piece0");
 	console.log("CheckerPiece.constructor: " + this);
 	this.state = state;
 	this.audioBoard = null;
